@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Game.CodeBase.Common.StateManagement;
+using Game.CodeBase.Player.State;
 using Mirror;
 using UnityEngine;
 
@@ -16,9 +17,24 @@ namespace Game.CodeBase.Player
 
         public override void OnStartLocalPlayer()
         {
-            var states = new Dictionary<IEnterState, List<ITransition>>();
+            var states = new Dictionary<IEnterState, List<ITransition>>()
+            {
+                {
+                    new PlayerIdleState(this),
+                    new List<ITransition>()
+                },
+                {
+                    new PlayerMoveState(this),
+                    new List<ITransition>()
+                },
+            };
 
             _stateMachine = new StateMachine(states);
+        }
+
+        private void Update()
+        {
+            _stateMachine?.Update();
         }
     }
 }
