@@ -1,4 +1,6 @@
-﻿using Mirror;
+﻿using System.Collections.Generic;
+using Game.CodeBase.Common.StateManagement;
+using Mirror;
 using UnityEngine;
 
 namespace Game.CodeBase.Player
@@ -9,5 +11,14 @@ namespace Game.CodeBase.Player
     {
         [SerializeField] private CharacterController _controller;
         [SerializeField] private PlayerInputService _input;
+
+        private StateMachine _stateMachine;
+
+        public override void OnStartLocalPlayer()
+        {
+            var states = new Dictionary<IEnterState, List<ITransition>>();
+
+            _stateMachine = new StateMachine(states);
+        }
     }
 }
