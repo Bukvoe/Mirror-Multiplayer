@@ -27,7 +27,6 @@ namespace Game.CodeBase.World
             }
         }
 
-        [Server]
         private IEnumerator RespawnOnArenaAfterDelay(Player player, float seconds)
         {
             _playerFollowCamera.Unfollow();
