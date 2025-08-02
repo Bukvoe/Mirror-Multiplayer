@@ -32,6 +32,8 @@ namespace Game.CodeBase.Character.State
             _player.UpdateVerticalVelocity();
             _player.MoveByVelocity();
 
+            _player.UpdateModelRotation(_input.MoveInput);
+
             _player.UpdateSayHello();
         }
     }

@@ -24,8 +24,11 @@ namespace Game.CodeBase.UI
 
         private void OnDestroy()
         {
-            CustomNetworkManager.Instance.PlayerAdded -= OnPlayerAdded;
-            CustomNetworkManager.Instance.PlayerRemoved -= OnPlayerRemoved;
+            if (CustomNetworkManager.Instance != null)
+            {
+                CustomNetworkManager.Instance.PlayerAdded -= OnPlayerAdded;
+                CustomNetworkManager.Instance.PlayerRemoved -= OnPlayerRemoved;
+            }
         }
 
         private void Update()
