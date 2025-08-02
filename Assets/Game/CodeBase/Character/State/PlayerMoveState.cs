@@ -1,20 +1,25 @@
-﻿using Game.CodeBase.Common.StateManagement;
+﻿using Game.CodeBase.Common;
+using Game.CodeBase.Common.StateManagement;
+using UnityEngine;
 
 namespace Game.CodeBase.Character.State
 {
     public class PlayerMoveState : IEnterState, IExitState, IUpdateState
     {
+        private readonly Animator _animator;
         private readonly Player _player;
         private readonly PlayerInputService _input;
 
-        public PlayerMoveState(Player player, PlayerInputService input)
+        public PlayerMoveState(Player player, PlayerInputService input, Animator animator)
         {
             _player = player;
             _input = input;
+            _animator = animator;
         }
 
         public void Enter()
         {
+            _animator.SetState(Player.Animation.Run);
         }
 
         public void Exit()

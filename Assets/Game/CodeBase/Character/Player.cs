@@ -11,6 +11,12 @@ namespace Game.CodeBase.Character
     [RequireComponent(typeof(PlayerInputService))]
     public class Player : NetworkBehaviour
     {
+        public enum Animation
+        {
+            Idle = 0,
+            Run = 1,
+        }
+
         private const float MovementThreshold = 0.01f;
 
         [SyncVar(hook = nameof(OnNickNameChange))]
@@ -18,6 +24,7 @@ namespace Game.CodeBase.Character
 
         [SerializeField] private CharacterController _controller;
         [SerializeField] private PlayerInputService _input;
+        [SerializeField] private NetworkAnimator _networkAnimator;
         [SerializeField] private float _moveSpeed;
         [SerializeField] private float _gravity = -9.81f;
 
@@ -33,7 +40,7 @@ namespace Game.CodeBase.Character
             var states = new Dictionary<IEnterState, List<ITransition>>()
             {
                 {
-                    new PlayerIdleState(this),
+                    new PlayerIdleState(this, _networkAnimator.animator),
                     new List<ITransition>
                     {
                         new Transition<PlayerMoveState>(() =>
@@ -41,7 +48,7 @@ namespace Game.CodeBase.Character
                     }
                 },
                 {
-                    new PlayerMoveState(this, _input),
+                    new PlayerMoveState(this, _input, _networkAnimator.animator),
                     new List<ITransition>
                     {
                         new Transition<PlayerIdleState>(() =>
