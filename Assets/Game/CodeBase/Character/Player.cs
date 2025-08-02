@@ -24,6 +24,8 @@ namespace Game.CodeBase.Character
         private StateMachine _stateMachine;
         private Vector3 _velocity;
 
+        public string Nickname => _nickname;
+
         public override void OnStartLocalPlayer()
         {
             CmdSetNickname(CustomNetworkManager.Singleton.Nickname);
