@@ -1,4 +1,5 @@
 ﻿using Game.CodeBase.Common.StateManagement;
+using UnityEngine;
 
 namespace Game.CodeBase.Player.State
 {
@@ -13,6 +14,7 @@ namespace Game.CodeBase.Player.State
 
         public void Enter()
         {
+            _player.UpdateHorizontalVelocity(Vector2.zero);
         }
 
         public void Exit()
@@ -21,6 +23,8 @@ namespace Game.CodeBase.Player.State
 
         public void Update()
         {
+            _player.UpdateVerticalVelocity();
+            _player.MoveByVelocity();
         }
     }
 }

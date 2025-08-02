@@ -10,10 +10,15 @@ namespace Game.CodeBase.Player
     [RequireComponent(typeof(PlayerInputService))]
     public class Player : NetworkBehaviour
     {
+        private const float MovementThreshold = 0.01f;
+
         [SerializeField] private CharacterController _controller;
         [SerializeField] private PlayerInputService _input;
+        [SerializeField] private float _moveSpeed;
+        [SerializeField] private float _gravity = -9.81f;
 
         private StateMachine _stateMachine;
+        private Vector3 _velocity;
 
         public override void OnStartLocalPlayer()
         {
@@ -21,11 +26,19 @@ namespace Game.CodeBase.Player
             {
                 {
                     new PlayerIdleState(this),
-                    new List<ITransition>()
+                    new List<ITransition>
+                    {
+                        new Transition<PlayerMoveState>(() =>
+                            _input.MoveInput.magnitude > MovementThreshold && _controller.isGrounded),
+                    }
                 },
                 {
-                    new PlayerMoveState(this),
-                    new List<ITransition>()
+                    new PlayerMoveState(this, _input),
+                    new List<ITransition>
+                    {
+                        new Transition<PlayerIdleState>(() =>
+                            _input.MoveInput.magnitude <= MovementThreshold || !_controller.isGrounded),
+                    }
                 },
             };
 
@@ -35,6 +48,32 @@ namespace Game.CodeBase.Player
         private void Update()
         {
             _stateMachine?.Update();
+        }
+
+        public void UpdateHorizontalVelocity(Vector2 input)
+        {
+            var horizontalMove = new Vector3(input.x, 0, input.y);
+            horizontalMove = transform.TransformDirection(horizontalMove);
+
+            _velocity.x = horizontalMove.x * _moveSpeed;
+            _velocity.z = horizontalMove.z * _moveSpeed;
+        }
+
+        public void UpdateVerticalVelocity()
+        {
+            if (_controller.isGrounded && _velocity.y < 0)
+            {
+                _velocity.y = _gravity;
+            }
+            else
+            {
+                _velocity.y += _gravity * Time.deltaTime;
+            }
+        }
+
+        public void MoveByVelocity()
+        {
+            _controller.Move(_velocity * Time.deltaTime);
         }
     }
 }
