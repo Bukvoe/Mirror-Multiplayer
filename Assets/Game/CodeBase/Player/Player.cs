@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Game.CodeBase.Common.StateManagement;
+using Game.CodeBase.Network;
 using Game.CodeBase.Player.State;
 using Mirror;
 using UnityEngine;
@@ -12,6 +13,9 @@ namespace Game.CodeBase.Player
     {
         private const float MovementThreshold = 0.01f;
 
+        [SyncVar(hook = nameof(OnNickNameChange))]
+        private string _nickname = string.Empty;
+
         [SerializeField] private CharacterController _controller;
         [SerializeField] private PlayerInputService _input;
         [SerializeField] private float _moveSpeed;
@@ -22,6 +26,11 @@ namespace Game.CodeBase.Player
 
         public override void OnStartLocalPlayer()
         {
+            if (NetworkManager.singleton is CustomNetworkManager customNetworkManager)
+            {
+                CmdSetNickname(customNetworkManager.Nickname);
+            }
+
             var states = new Dictionary<IEnterState, List<ITransition>>()
             {
                 {
@@ -74,6 +83,22 @@ namespace Game.CodeBase.Player
         public void MoveByVelocity()
         {
             _controller.Move(_velocity * Time.deltaTime);
+        }
+
+        [Command]
+        private void CmdSetNickname(string nickname)
+        {
+            if (string.IsNullOrWhiteSpace(nickname))
+            {
+                nickname = $"Player{Random.Range(1000, 10000)}";
+            }
+
+            _nickname = nickname;
+        }
+
+        private void OnNickNameChange(string oldNickname, string newNickname)
+        {
+            _nickname = newNickname;
         }
     }
 }
