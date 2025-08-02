@@ -23,12 +23,23 @@ namespace Game.CodeBase.Cameras
             }
         }
 
+        public void Follow(Player player)
+        {
+            _camera.Follow = player.transform;
+            _camera.LookAt = player.transform;
+        }
+
+        public void Unfollow()
+        {
+            _camera.Follow = null;
+            _camera.LookAt = null;
+        }
+
         private void OnPlayerAdded(Player player)
         {
             if (player.isLocalPlayer)
             {
-                _camera.Follow = player.transform;
-                _camera.LookAt = player.transform;
+                Follow(player);
             }
         }
     }

@@ -188,5 +188,13 @@ namespace Game.CodeBase.Character
                 cube.Rigidbody.AddForce(direction.normalized * _pushForce, ForceMode.Impulse);
             }
         }
+
+        public void TeleportToPoint(Vector3 position)
+        {
+            _controller.enabled = false;
+            transform.position = position;
+            _velocity = Vector3.zero;
+            _controller.enabled = true;
+        }
     }
 }
