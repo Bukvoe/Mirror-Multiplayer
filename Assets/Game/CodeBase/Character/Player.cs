@@ -28,7 +28,7 @@ namespace Game.CodeBase.Character
 
         public override void OnStartLocalPlayer()
         {
-            CmdSetNickname(CustomNetworkManager.Singleton.Nickname);
+            CmdSetNickname(CustomNetworkManager.Instance.Nickname);
 
             var states = new Dictionary<IEnterState, List<ITransition>>()
             {
@@ -55,12 +55,12 @@ namespace Game.CodeBase.Character
 
         public override void OnStartClient()
         {
-            CustomNetworkManager.Singleton.Players.Add(this);
+            CustomNetworkManager.Instance.RegisterPlayer(this);
         }
 
         public override void OnStopClient()
         {
-            CustomNetworkManager.Singleton.Players.Remove(this);
+            CustomNetworkManager.Instance.UnregisterPlayer(this);
         }
 
         private void Update()
