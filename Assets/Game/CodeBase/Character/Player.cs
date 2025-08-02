@@ -94,6 +94,26 @@ namespace Game.CodeBase.Character
             _controller.Move(_velocity * Time.deltaTime);
         }
 
+        public void UpdateSayHello()
+        {
+            if (_input.SayActionPressed)
+            {
+                CmdSayHello();
+            }
+        }
+
+        [Command]
+        private void CmdSayHello()
+        {
+            RpcReceiveSayHello();
+        }
+
+        [ClientRpc(includeOwner = true)]
+        private void RpcReceiveSayHello()
+        {
+            Debug.Log($"Hello from {Nickname}");
+        }
+
         [Command]
         private void CmdSetNickname(string nickname)
         {
