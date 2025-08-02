@@ -31,6 +31,7 @@ namespace Game.CodeBase.Character.State
             _player.MoveByVelocity();
 
             _player.UpdateSayHello();
+            _player.UpdateSpawnCube();
         }
     }
 }

@@ -35,6 +35,7 @@ namespace Game.CodeBase.Character.State
             _player.UpdateModelRotation(_input.MoveInput);
 
             _player.UpdateSayHello();
+            _player.UpdateSpawnCube();
         }
     }
 }

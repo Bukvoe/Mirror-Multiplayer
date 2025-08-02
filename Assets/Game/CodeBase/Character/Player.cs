@@ -2,6 +2,7 @@
 using Game.CodeBase.Character.State;
 using Game.CodeBase.Common.StateManagement;
 using Game.CodeBase.Network;
+using Game.CodeBase.Props;
 using Mirror;
 using UnityEngine;
 
@@ -25,8 +26,15 @@ namespace Game.CodeBase.Character
         [SerializeField] private CharacterController _controller;
         [SerializeField] private PlayerInputService _input;
         [SerializeField] private NetworkAnimator _networkAnimator;
+        [SerializeField] private Transform _modelTransform;
+        [SerializeField] private Transform _spawnCubePoint;
         [SerializeField] private float _moveSpeed;
+        [SerializeField] private float _rotationSpeed;
+        [SerializeField] private float _pushForce;
         [SerializeField] private float _gravity = -9.81f;
+
+        [Header("Prefabs")]
+        [SerializeField] private Cube _cubePrefab;
 
         private StateMachine _stateMachine;
         private Vector3 _velocity;
@@ -44,7 +52,7 @@ namespace Game.CodeBase.Character
                     new List<ITransition>
                     {
                         new Transition<PlayerMoveState>(() =>
-                            _input.MoveInput.magnitude > MovementThreshold && _controller.isGrounded),
+                            _input.MoveInput.sqrMagnitude > MovementThreshold && _controller.isGrounded),
                     }
                 },
                 {
@@ -52,7 +60,7 @@ namespace Game.CodeBase.Character
                     new List<ITransition>
                     {
                         new Transition<PlayerIdleState>(() =>
-                            _input.MoveInput.magnitude <= MovementThreshold || !_controller.isGrounded),
+                            _input.MoveInput.sqrMagnitude <= MovementThreshold || !_controller.isGrounded),
                     }
                 },
             };
@@ -101,12 +109,39 @@ namespace Game.CodeBase.Character
             _controller.Move(_velocity * Time.deltaTime);
         }
 
+        public void UpdateModelRotation(Vector2 input)
+        {
+            if (input.sqrMagnitude < MovementThreshold)
+            {
+                return;
+            }
+
+            var direction = new Vector3(input.x, 0f, input.y).normalized;
+            var targetRotation = Quaternion.LookRotation(direction);
+            _modelTransform.rotation = Quaternion.Slerp(_modelTransform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+        }
+
         public void UpdateSayHello()
         {
             if (_input.SayActionPressed)
             {
                 CmdSayHello();
             }
+        }
+
+        public void UpdateSpawnCube()
+        {
+            if (_input.SpawnActionPressed)
+            {
+                CmdSpawnCube();
+            }
+        }
+
+        [Command]
+        private void CmdSpawnCube()
+        {
+            var cube = Instantiate(_cubePrefab.gameObject, _spawnCubePoint.position, Quaternion.identity);
+            NetworkServer.Spawn(cube, ownerConnection: null);
         }
 
         [Command]
@@ -135,6 +170,23 @@ namespace Game.CodeBase.Character
         private void OnNickNameChange(string oldNickname, string newNickname)
         {
             _nickname = newNickname;
+        }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            if (hit.gameObject.TryGetComponent<Cube>(out var cube))
+            {
+                CmdRequestPush(cube.netIdentity, new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z));
+            }
+        }
+
+        [Command]
+        private void CmdRequestPush(NetworkIdentity cubeIdentity, Vector3 direction)
+        {
+            if (cubeIdentity.TryGetComponent<Cube>(out var cube))
+            {
+                cube.Rigidbody.AddForce(direction.normalized * _pushForce, ForceMode.Impulse);
+            }
         }
     }
 }
