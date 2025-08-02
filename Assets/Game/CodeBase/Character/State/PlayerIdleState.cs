@@ -1,7 +1,7 @@
 ﻿using Game.CodeBase.Common.StateManagement;
 using UnityEngine;
 
-namespace Game.CodeBase.Player.State
+namespace Game.CodeBase.Character.State
 {
     public class PlayerIdleState : IEnterState, IExitState, IUpdateState
     {

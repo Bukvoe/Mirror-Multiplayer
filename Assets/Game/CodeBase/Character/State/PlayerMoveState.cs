@@ -1,6 +1,6 @@
 ﻿using Game.CodeBase.Common.StateManagement;
 
-namespace Game.CodeBase.Player.State
+namespace Game.CodeBase.Character.State
 {
     public class PlayerMoveState : IEnterState, IExitState, IUpdateState
     {

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Game.CodeBase.Player
+namespace Game.CodeBase.Character
 {
     [RequireComponent(typeof(PlayerInput))]
     public class PlayerInputService : MonoBehaviour

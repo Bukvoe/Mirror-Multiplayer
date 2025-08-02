@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using Game.CodeBase.Character.State;
 using Game.CodeBase.Common.StateManagement;
 using Game.CodeBase.Network;
-using Game.CodeBase.Player.State;
 using Mirror;
 using UnityEngine;
 
-namespace Game.CodeBase.Player
+namespace Game.CodeBase.Character
 {
     [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(PlayerInputService))]
@@ -26,10 +26,7 @@ namespace Game.CodeBase.Player
 
         public override void OnStartLocalPlayer()
         {
-            if (NetworkManager.singleton is CustomNetworkManager customNetworkManager)
-            {
-                CmdSetNickname(customNetworkManager.Nickname);
-            }
+            CmdSetNickname(CustomNetworkManager.Singleton.Nickname);
 
             var states = new Dictionary<IEnterState, List<ITransition>>()
             {
@@ -52,6 +49,16 @@ namespace Game.CodeBase.Player
             };
 
             _stateMachine = new StateMachine(states);
+        }
+
+        public override void OnStartClient()
+        {
+            CustomNetworkManager.Singleton.Players.Add(this);
+        }
+
+        public override void OnStopClient()
+        {
+            CustomNetworkManager.Singleton.Players.Remove(this);
         }
 
         private void Update()
